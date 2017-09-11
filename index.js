@@ -148,3 +148,9 @@ client.on('device-offline', (device) => {
 
 log.info('Starting Device Discovery');
 client.startDiscovery();
+
+const pollingTimer = setInterval(() => {
+    client.devices.forEach((device) => {
+        mqttPublish(config.name + "/status/" + device.deviceId + "/poweron", (device.getPowerState()) ? "true" : "false");
+    });
+}, 1000);
