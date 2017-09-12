@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const Mqtt = require('mqtt');
 const Hs100Api = require('hs100-api');
 const log = require('yalm');

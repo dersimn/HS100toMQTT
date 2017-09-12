@@ -1,4 +1,11 @@
-## Using Docker
+## Usage
+
+	npm install -g hs100tomqtt
+	hs100tomqtt --help
+
+## Using with Docker
+
+In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.
 
 ### docker run
 
@@ -26,3 +33,8 @@ For some reason `Ctrl-C` is not working, workaround with named container:
 #### Manually build
 	
 	docker build -t username/HS100toMQTT .
+
+## Credits
+
+This project follows [Oliver "owagner" Wagner](https://github.com/owagner)'s architectural proposal for an [mqtt-smarthome](https://github.com/mqtt-smarthome/mqtt-smarthome).  
+Built by copy-pasting together [Sebastian "hobbyquaker" Raff](https://github.com/hobbyquaker)'s mqtt-smarthome scripts and [Patrick "plasticrake" Seal](https://github.com/plasticrake)'s [hs100-api](https://github.com/plasticrake/hs100-api).
