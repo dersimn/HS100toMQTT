@@ -151,6 +151,14 @@ client.startDiscovery();
 
 const pollingTimer = setInterval(() => {
     client.devices.forEach((device) => {
-        mqttPublish(config.name + "/status/" + device.deviceId + "/poweron", (device.getPowerState()) ? "true" : "false");
+        device.getPowerState().then((state) => {
+            mqttPublish(config.name + "/status/" + device.deviceId + "/poweron", (state) ? "true" : "false");
+        });
+        device.getConsumption().then((consumption) => {
+            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/current", consumption.current.toString());
+            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/voltage", consumption.voltage.toString());
+            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/power",   consumption.power.toString());
+            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/total",   consumption.total.toString());
+        });
     });
 }, 1000);
