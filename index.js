@@ -128,6 +128,7 @@ mqtt.on('message', (topic, payload) => {
 
 
 const client = new Hs100Api.Client();
+
 client.on('device-new', (device) => {
     log.info('hs100 device-new', device.model, device.host, device.deviceId, device.name);
     mqttPublish(device, "/online", "true");
@@ -135,20 +136,20 @@ client.on('device-new', (device) => {
     device.startPolling(config.pollingInterval);
 
     device.on('power-on', (device) => { 
-        log.debug('hs100 power-on', device.name);
+        log.debug('hs100 power-on callback', device.name);
         mqttPublish(device, "/poweron", "true");
     });
     device.on('power-off', (device) => { 
-        log.debug('hs100 power-off', device.name);
+        log.debug('hs100 power-off callback', device.name);
         mqttPublish(device, "/poweron", "false");
     });
 });
 client.on('device-online', (device) => { 
-    log.debug('hs100 device-online', device.name);
+    log.debug('hs100 device-online callback', device.name);
     mqttPublish(device, "/online", "true");
 });
 client.on('device-offline', (device) => { 
-    log.warn('hs100 device-offline', device.name);
+    log.warn('hs100 device-offline callback', device.name);
     mqttPublish(device, "/online", "false");
 });
 
