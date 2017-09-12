@@ -1,0 +1,4 @@
+Switch HS110_Plug {mqtt=">[mosquitto:hs100/set/ID/poweron:command:*:MAP(boolean.map)], <[mosquitto:hs100/status/ID/poweron:state:MAP(boolean.map)]",  autoupdate="false"}
+
+Number HS110_Plug_Watts "Watt [%f]" {mqtt="<[mosquitto:hs100/status/ID/consumption/power:state:default]"}
+Number HS110_Plug_Volts "Volt [%f]" {mqtt="<[mosquitto:hs100/status/ID/consumption/voltage:state:default]"}
