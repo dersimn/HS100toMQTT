@@ -1,17 +1,26 @@
 {
-  "name": "HS100toMQTT",
+  "name": "hs100tomqtt",
   "version": "0.0.1",
-  "description": "",
+  "description": "In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Simon Christmann <simon@christmann.email>",
   "license": "ISC",
   "dependencies": {
     "hs100-api": "^0.10.1",
     "mqtt": "^2.12.1",
     "yalm": "^4.0.2",
     "yargs": "^8.0.2"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dersimn/HS100toMQTT.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dersimn/HS100toMQTT/issues"
+  },
+  "homepage": "https://github.com/dersimn/HS100toMQTT#readme"
 }
