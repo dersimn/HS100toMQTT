@@ -154,7 +154,11 @@ client.on('device-offline', (device) => {
 });
 
 log.info('Starting Device Discovery');
-client.startDiscovery();
+client.startDiscovery({
+    devices: [
+        {host: "10.1.1.209"}
+    ]
+});
 
 const pollingTimer = setInterval(() => {
     client.devices.forEach((device) => {
