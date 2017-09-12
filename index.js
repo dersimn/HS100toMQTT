@@ -12,6 +12,7 @@ const config = require('yargs')
     .describe('mqtt-username', 'mqtt broker username')
     .describe('mqtt-password', 'mqtt broker password')
     .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages')
+    .describe('polling-interval', 'polling interval (in ms) to search for new devices and poll already added devices for status updates')
     .alias({
         h: 'help',
         m: 'mqtt-url',
@@ -21,7 +22,8 @@ const config = require('yargs')
     .default({
         name: 'hs100',
         'mqtt-url': 'mqtt://127.0.0.1',
-        'mqtt-retain': true
+        'mqtt-retain': true,
+        'polling-interval': 3000
     })
     .version()
     .help('help')
@@ -126,7 +128,7 @@ client.on('device-new', (device) => {
     log.info('hs100 device-new', device.model, device.host, device.deviceId, device.name);
     mqttPublish(config.name + "/status/" + device.deviceId + "/online", "true");
 
-    device.startPolling(1000);
+    device.startPolling(config.pollingInterval);
 
     device.on('power-on', (device) => { 
         log.debug('hs100 power-on', device.name);
@@ -161,4 +163,4 @@ const pollingTimer = setInterval(() => {
             mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/total",   consumption.total.toString());
         });
     });
-}, 1000);
+}, config.pollingInterval);
