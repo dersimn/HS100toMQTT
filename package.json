@@ -1,8 +1,11 @@
 {
   "name": "hs100tomqtt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.",
   "main": "index.js",
+  "bin": {
+    "hs100tomqtt": "index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,5 +25,11 @@
   "bugs": {
     "url": "https://github.com/dersimn/HS100toMQTT/issues"
   },
-  "homepage": "https://github.com/dersimn/HS100toMQTT#readme"
+  "homepage": "https://github.com/dersimn/HS100toMQTT#readme",
+  "keywords": [
+    "mqtt",
+    "smarthome",
+    "hs100",
+    "hs110"
+  ]
 }
