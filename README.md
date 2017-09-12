@@ -22,10 +22,10 @@ Run `docker run --rm dersimn/hs100tomqtt --help` to list all options.
 ### docker-compose service
 
 	hs100tomqtt:
-		image: dersimn/hs100tomqtt
-		environment:
-			- HS100TOMQTT_MQTT_URL="mqtt://MQTT_IP"
-		network_mode: "host"
+	  image: dersimn/hs100tomqtt
+	  environment:
+	    - HS100TOMQTT_MQTT_URL="mqtt://MQTT_IP"
+	  network_mode: "host"
 
 or
 
