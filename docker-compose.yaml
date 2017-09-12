@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  hs100tomqtt:
+      image: "dersimn/hs100tomqtt"
+      volumes:
+        - ./exampleDeviceTable.json:/node/deviceTable.json:ro
+      environment:
+        - HS100TOMQTT_MQTT_URL=mqtt://10.1.1.50
+        - HS100TOMQTT_DEVICE_TABLE=/node/deviceTable.json
+        - HS100TOMQTT_VERBOSITY=debug
