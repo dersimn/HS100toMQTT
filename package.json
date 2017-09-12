@@ -1,6 +1,6 @@
 {
   "name": "hs100tomqtt",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.",
   "main": "index.js",
   "bin": {
