@@ -6,7 +6,7 @@ const log = require('yalm');
 
 const pkg = require('./package.json');
 const config = require('yargs')
-    .env('HS100toMQTT')
+    .env('HS100TOMQTT')
     .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
     .describe('verbosity', 'possible values: "error", "warn", "info", "debug"')
     .describe('name', 'instance name. used as mqtt client id and as prefix for connected topic')

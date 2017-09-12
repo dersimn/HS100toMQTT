@@ -5,20 +5,37 @@
 
 ## Using with Docker
 
-In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.
+In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.  
+
+If your system doesn't work with `--net=host` (see *Docker for Mac* [issue](https://forums.docker.com/t/should-docker-run-net-host-work/14215)), use a pre-defined device table instead, see option `--device-table`.
 
 ### docker run
 
-	docker run -d dersimn/HS100toMQTT -m mqtt://MQTT_IP
+	docker run -d --net=host dersimn/hs100tomqtt -m mqtt://MQTT_IP
 
-Run `docker run --rm dersimn/HS100toMQTT --help` to list all options.
+or
+
+	docker run -d dersimn/hs100tomqtt -m mqtt://MQTT_IP --device-table /node/exampleDeviceTable.json
+
+Run `docker run --rm dersimn/hs100tomqtt --help` to list all options.
 
 ### docker-compose service
 
-	HS100toMQTT:
-		image: dersimn/HS100toMQTT
+	hs100tomqtt:
+		image: dersimn/hs100tomqtt
 		environment:
 			- HS100TOMQTT_MQTT_URL="mqtt://MQTT_IP"
+		network_mode: "host"
+
+or
+
+	hs100tomqtt:
+	  image: dersimn/hs100tomqtt
+	  volumes:
+        - ~/deviceTable.json:/node/deviceTable.json
+	  environment:
+	    - HS100TOMQTT_MQTT_URL=mqtt://MQTT_IP
+	    - HS100TOMQTT_DEVICE_TABLE=/node/deviceTable.json
 
 ### Debug
 
@@ -26,13 +43,13 @@ Run `docker run --rm dersimn/HS100toMQTT --help` to list all options.
 
 For some reason `Ctrl-C` is not working, workaround with named container:
 
-	docker run --rm -it --name=HS100toMQTT dersimn/HS100toMQTT --mqtt-retain=false -m mqtt://MQTT_IP -v debug
+	docker run --rm -it --name=hs100tomqtt dersimn/hs100tomqtt --mqtt-retain=false -m mqtt://MQTT_IP -v debug
 	Ctrl-P Ctrl-Q
-	docker stop HS100toMQTT
+	docker stop hs100tomqtt
 
 #### Manually build
 	
-	docker build -t username/HS100toMQTT .
+	docker build -t username/hs100tomqtt .
 
 ## Credits
 
