@@ -1,4 +1,11 @@
-## Using Docker
+## Usage
+
+	npm install -g hs100tomqtt
+	hs100tomqtt --help
+
+## Using with Docker
+
+In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.
 
 ### docker run
 
