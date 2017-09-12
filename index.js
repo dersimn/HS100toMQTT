@@ -68,14 +68,18 @@ mqtt.on('reconnect', () => {
     log.info('mqtt reconnect');
 });
 
-function mqttPublish(topic, payload, options = {retain: (config.mqttRetain)}) {
+function mqttPublish(device, service, payload, options = {retain: (config.mqttRetain)}) {
     if (typeof payload === 'object') {
         payload = JSON.stringify(payload);
-    } else if (payload) {
+    } else if (payload != null) {
         payload = String(payload);
     } else {
-        payload = '';
+        log.error("mqtt publish, payload given: NULL");
+        return;
     }
+
+    topic = config.name + "/status/" + device.deviceId + service;
+
     mqtt.publish(topic, payload, options, err => {
         if (err) {
             log.error('mqtt publish', err);
@@ -126,26 +130,26 @@ mqtt.on('message', (topic, payload) => {
 const client = new Hs100Api.Client();
 client.on('device-new', (device) => {
     log.info('hs100 device-new', device.model, device.host, device.deviceId, device.name);
-    mqttPublish(config.name + "/status/" + device.deviceId + "/online", "true");
+    mqttPublish(device, "/online", "true");
 
     device.startPolling(config.pollingInterval);
 
     device.on('power-on', (device) => { 
         log.debug('hs100 power-on', device.name);
-        mqttPublish(config.name + "/status/" + device.deviceId + "/poweron", "true");
+        mqttPublish(device, "/poweron", "true");
     });
     device.on('power-off', (device) => { 
         log.debug('hs100 power-off', device.name);
-        mqttPublish(config.name + "/status/" + device.deviceId + "/poweron", "false");
+        mqttPublish(device, "/poweron", "false");
     });
 });
 client.on('device-online', (device) => { 
     log.debug('hs100 device-online', device.name);
-    mqttPublish(config.name + "/status/" + device.deviceId + "/online", "true");
+    mqttPublish(device, "/online", "true");
 });
 client.on('device-offline', (device) => { 
     log.warn('hs100 device-offline', device.name);
-    mqttPublish(config.name + "/status/" + device.deviceId + "/online", "false");
+    mqttPublish(device, "/online", "false");
 });
 
 log.info('Starting Device Discovery');
@@ -154,13 +158,13 @@ client.startDiscovery();
 const pollingTimer = setInterval(() => {
     client.devices.forEach((device) => {
         device.getPowerState().then((state) => {
-            mqttPublish(config.name + "/status/" + device.deviceId + "/poweron", (state) ? "true" : "false");
+            mqttPublish(device, "/poweron", (state) ? "true" : "false");
         });
         device.getConsumption().then((consumption) => {
-            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/current", consumption.current.toString());
-            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/voltage", consumption.voltage.toString());
-            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/power",   consumption.power.toString());
-            mqttPublish(config.name + "/status/" + device.deviceId + "/consumption/total",   consumption.total.toString());
+            mqttPublish(device, "/consumption/current", consumption.current);
+            mqttPublish(device, "/consumption/voltage", consumption.voltage);
+            mqttPublish(device, "/consumption/power",   consumption.power);
+            mqttPublish(device, "/consumption/total",   consumption.total);
         });
     });
 }, config.pollingInterval);
