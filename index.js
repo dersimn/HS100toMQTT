@@ -15,6 +15,7 @@ const config = require('yargs')
     .describe('mqtt-password', 'mqtt broker password')
     .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages')
     .describe('polling-interval', 'polling interval (in ms) to search for new devices and poll already added devices for status updates')
+    .describe('device-table', 'load device table from json file')
     .alias({
         h: 'help',
         m: 'mqtt-url',
@@ -31,9 +32,16 @@ const config = require('yargs')
     .help('help')
     .argv;
 
+let devices = [];
+
 log.setLevel(config.verbosity);
 log.info(pkg.name + ' ' + pkg.version + ' starting');
 log.debug("loaded config: ", config);
+if (config.deviceTable) {
+    log.info('loading device table', config.deviceTable);
+    devices = require(config.deviceTable);
+    log.debug(devices);
+}
 
 log.info('mqtt trying to connect', config.mqttUrl);
 const mqtt = Mqtt.connect(config.mqttUrl, {
@@ -157,9 +165,7 @@ client.on('device-offline', (device) => {
 
 log.info('Starting Device Discovery');
 client.startDiscovery({
-    devices: [
-        {host: "10.1.1.209"}
-    ]
+    devices: devices
 });
 
 const pollingTimer = setInterval(() => {
