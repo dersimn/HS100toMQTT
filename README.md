@@ -32,7 +32,7 @@ or
 	hs100tomqtt:
 	  image: dersimn/hs100tomqtt
 	  volumes:
-        - ~/deviceTable.json:/node/deviceTable.json
+        - ~/deviceTable.json:/node/deviceTable.json:ro
 	  environment:
 	    - HS100TOMQTT_MQTT_URL=mqtt://MQTT_IP
 	    - HS100TOMQTT_DEVICE_TABLE=/node/deviceTable.json
