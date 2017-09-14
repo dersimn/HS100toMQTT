@@ -3,6 +3,7 @@
 const Mqtt = require('mqtt');
 const Hs100Api = require('hs100-api');
 const log = require('yalm');
+//const log = {setLevel: ()=>{}, debug: console.log, info: console.log, warn: console.log, error: console.log };
 
 const pkg = require('./package.json');
 const config = require('yargs')
@@ -137,7 +138,7 @@ mqtt.on('message', (topic, payload) => {
 });
 
 
-const client = new Hs100Api.Client();
+const client = new Hs100Api.Client({logLevel: config.verbosity, logger: log});
 
 client.on('device-new', (device) => {
     log.info('hs100 device-new', device.model, device.host, device.deviceId, device.name);
