@@ -160,7 +160,7 @@ client.on('device-new', (device) => {
     });
 
     device.on('consumption-update', (device, consumption) => { 
-        log.debug('hs100 consumption-update callback', device.name, consumption);
+        log.debug('hs100 consumption-update callback', device.name, String(consumption.power) );
 
         mqttPublish(device, "/consumption/current", consumption.current);
         mqttPublish(device, "/consumption/voltage", consumption.voltage);
