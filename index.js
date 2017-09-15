@@ -146,13 +146,26 @@ client.on('device-new', (device) => {
 
     device.startPolling(config.pollingInterval);
 
-    device.on('power-on', (device) => { 
+    device.on('power-on', (device, powerOn) => { 
         log.debug('hs100 power-on callback', device.name);
-        mqttPublish(device, "/poweron", "true");
+        mqttPublish(device, "/poweron", powerOn);
     });
-    device.on('power-off', (device) => { 
+    device.on('power-off', (device, powerOn) => { 
         log.debug('hs100 power-off callback', device.name);
-        mqttPublish(device, "/poweron", "false");
+        mqttPublish(device, "/poweron", powerOn);
+    });
+    device.on('power-update', (device, powerOn) => { 
+        log.debug('hs100 power-update callback', device.name, powerOn);
+        mqttPublish(device, "/poweron", powerOn);
+    });
+
+    device.on('consumption-update', (device, consumption) => { 
+        log.debug('hs100 consumption-update callback', device.name, consumption);
+
+        mqttPublish(device, "/consumption/current", consumption.current);
+        mqttPublish(device, "/consumption/voltage", consumption.voltage);
+        mqttPublish(device, "/consumption/power",   consumption.power);
+        mqttPublish(device, "/consumption/total",   consumption.total);
     });
 });
 client.on('device-online', (device) => { 
@@ -168,17 +181,3 @@ log.info('Starting Device Discovery');
 client.startDiscovery({
     devices: devices
 });
-
-const pollingTimer = setInterval(() => {
-    client.devices.forEach((device) => {
-        device.getPowerState().then((state) => {
-            mqttPublish(device, "/poweron", (state) ? "true" : "false");
-        });
-        device.getConsumption().then((consumption) => {
-            mqttPublish(device, "/consumption/current", consumption.current);
-            mqttPublish(device, "/consumption/voltage", consumption.voltage);
-            mqttPublish(device, "/consumption/power",   consumption.power);
-            mqttPublish(device, "/consumption/total",   consumption.total);
-        });
-    });
-}, config.pollingInterval);
