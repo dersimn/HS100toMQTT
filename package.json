@@ -14,7 +14,7 @@
   "dependencies": {
     "hs100-api": "file:../../sandbox/hs100-api",
     "mqtt": "^2.12.1",
-    "yalm": "file:../../sandbox/yalm",
+    "yalm": "^4.1.0",
     "yargs": "^8.0.2"
   },
   "devDependencies": {},
