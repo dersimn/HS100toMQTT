@@ -45,6 +45,7 @@ if (config.deviceTable) {
 }
 
 log.info('mqtt trying to connect', config.mqttUrl);
+var mqttConnected = false;
 const mqtt = Mqtt.connect(config.mqttUrl, {
     clientId: config.name + '_' + Math.random().toString(16).substr(2, 8),
     will: {topic: config.name + '/connected', payload: '0', retain: (config.mqttRetain)},
@@ -179,5 +180,6 @@ client.on('device-offline', (device) => {
 
 log.info('Starting Device Discovery');
 client.startDiscovery({
-    devices: devices
+    devices: devices,
+    discoveryInterval: config.pollingInterval
 });
