@@ -1,19 +1,17 @@
-## Usage
+## npm
 
 	npm install -g hs100tomqtt
 	hs100tomqtt --help
 
-## Using with Docker
+## Docker
 
 In order to use automatic device discovery, you have to run docker with `--net=host` or equivalent configuration.  
-
-If your system doesn't work with `--net=host` (see *Docker for Mac* [issue](https://forums.docker.com/t/should-docker-run-net-host-work/14215)), use a pre-defined device table instead, see option `--device-table`.
+If your system doesn't work with `--net=host` (see *Docker for Mac* [issue](https://forums.docker.com/t/should-docker-run-net-host-work/14215)), use a pre-defined device table instead, call `--help` and look for option `--device-table`.
 
 ### docker run
 
 	docker run -d --net=host dersimn/hs100tomqtt -m mqtt://MQTT_IP
-
-or
+	docker run -d --net=host dersimn/hs100tomqtt:armhf -m mqtt://MQTT_IP
 
 	docker run -d dersimn/hs100tomqtt -m mqtt://MQTT_IP --device-table /node/exampleDeviceTable.json
 
@@ -37,19 +35,20 @@ or
 	    - HS100TOMQTT_MQTT_URL=mqtt://MQTT_IP
 	    - HS100TOMQTT_DEVICE_TABLE=/node/deviceTable.json
 
-### Debug
+## Development / Debug
 
-#### Show debugging output
+### Show debugging output
 
-For some reason `Ctrl-C` is not working, workaround with named container:
+For some reason `Ctrl-C` is not working, workaround:
 
 	docker run --rm -it --name=hs100tomqtt dersimn/hs100tomqtt --mqtt-retain=false -m mqtt://MQTT_IP -v debug
 	Ctrl-P Ctrl-Q
 	docker stop hs100tomqtt
 
-#### Manually build
+### Manually build
 	
-	docker build -t username/hs100tomqtt .
+	docker build -t hs100tomqtt .
+	docker build -t hs100tomqtt:armhf -f Dockerfile.armhf .
 
 ## Credits
 
