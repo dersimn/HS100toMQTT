@@ -1,0 +1,27 @@
+sudo: required
+services:
+  - docker
+language: bash
+script:
+# prepare qemu
+- sudo apt-get update
+- sudo apt-get install -y wget git
+- sudo apt-get remove docker-ce
+- echo "deb [arch=amd64 trusted=yes] http://ftp.unicamp.br/pub/linuxpatch/ubuntu/14_04/misc/docker-17.04.0-ce-amd64/ trusty main" | sudo tee /etc/apt/sources.list.d/docker-engine.list
+- sudo apt-get update
+- sudo apt-get install -y docker-engine
+- docker run --rm --privileged multiarch/qemu-user-static:register
+- wget https://github.com/multiarch/qemu-user-static/releases/download/v2.9.1/qemu-arm-static.tar.gz -O /tmp/qemu-arm-static.tar.gz
+- tar zxvf /tmp/qemu-arm-static.tar.gz -C /tmp
+# build image
+- docker build --volume type=bind,source=/tmp/qemu-arm-static,target=/usr/bin/qemu-arm-static -t tmptag -f Dockerfile.armhf .
+# test image
+- docker run -v /tmp/qemu-arm-static:/usr/bin/qemu-arm-static tmptag
+# push image
+- >
+  if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+    TAG=$(if [ "$TRAVIS_BRANCH" == "master" ]; then echo "armhf"; else echo "$TRAVIS_BRANCH-armhf" ; fi)
+    docker tag tmptag $DOCKER_USER/hs100tomqtt:$TAG
+    docker push $DOCKER_USER/hs100tomqtt:$TAG
+  fi
