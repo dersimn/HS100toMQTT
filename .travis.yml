@@ -15,8 +15,6 @@ script:
 - tar zxvf /tmp/qemu-arm-static.tar.gz -C /tmp
 # build image
 - docker build --volume type=bind,source=/tmp/qemu-arm-static,target=/usr/bin/qemu-arm-static -t tmptag -f Dockerfile.armhf .
-# test image
-- docker run -v /tmp/qemu-arm-static:/usr/bin/qemu-arm-static tmptag
 # push image
 - >
   if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
