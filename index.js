@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const Mqtt = require('mqtt');
-const Hs100Api = require('hs100-api');
+const Hs100Api = require('tplink-smarthome-api');
 const log = require('yalm');
 //const log = {setLevel: ()=>{}, debug: console.log, info: console.log, warn: console.log, error: console.log };
 
