@@ -147,21 +147,21 @@ client.on('device-new', (device) => {
 
     device.startPolling(config.pollingInterval);
 
-    device.on('power-on', (device, powerOn) => { 
+    device.on('power-on', () => { 
         log.debug('hs100 power-on callback', device.name);
-        mqttPublish(device, "/poweron", powerOn);
+        mqttPublish(device, "/poweron", true);
     });
-    device.on('power-off', (device, powerOn) => { 
+    device.on('power-off', () => { 
         log.debug('hs100 power-off callback', device.name);
-        mqttPublish(device, "/poweron", powerOn);
+        mqttPublish(device, "/poweron", false);
     });
-    device.on('power-update', (device, powerOn) => { 
+    device.on('power-update', (powerOn) => { 
         log.debug('hs100 power-update callback', device.name, powerOn);
         mqttPublish(device, "/poweron", powerOn);
     });
 
-    device.on('consumption-update', (device, consumption) => { 
-        log.debug('hs100 consumption-update callback', device.name, String(consumption.power) );
+    device.on('emeter-realtime-update', (consumption) => { 
+        log.debug('hs100 emeter-realtime-update callback', device.name, String(consumption.power) );
 
         mqttPublish(device, "/consumption/current", consumption.current);
         mqttPublish(device, "/consumption/voltage", consumption.voltage);
