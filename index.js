@@ -17,7 +17,7 @@ const config = require('yargs')
     .describe('mqtt-password', 'mqtt broker password')
     .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages').boolean('mqtt-retain')
     .describe('polling-interval', 'polling interval (in ms) for status updates')
-    .describe('device-table', 'load device table from json file')
+    .describe('devices', 'specify fixed device IPs instead of auto-discover').array('devices')
     .alias({
         h: 'help',
         m: 'mqtt-url',
@@ -38,10 +38,10 @@ let devices = [];
 log.setLevel(config.verbosity);
 log.info(pkg.name + ' ' + pkg.version + ' starting');
 log.debug("loaded config: ", config);
-if (config.deviceTable) {
-    log.info('loading device table', config.deviceTable);
-    devices = require(config.deviceTable);
-    log.debug(devices);
+if (config.devices instanceof Array) {
+    config.devices.forEach( (ip) => {
+        devices.push({"host":ip, "port":9999});
+    });
 }
 
 log.info('mqtt trying to connect', config.mqttUrl);
