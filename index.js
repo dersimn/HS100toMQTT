@@ -16,7 +16,7 @@ const config = require('yargs')
     .describe('mqtt-username', 'mqtt broker username')
     .describe('mqtt-password', 'mqtt broker password')
     .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages').boolean('mqtt-retain')
-    .describe('polling-interval', 'polling interval (in ms) to search for new devices and poll already added devices for status updates')
+    .describe('polling-interval', 'polling interval (in ms) for status updates')
     .describe('device-table', 'load device table from json file')
     .alias({
         h: 'help',
@@ -59,90 +59,46 @@ mqtt.on('connect', () => {
     mqtt.publish(config.name + '/connected', '1', {retain: (config.mqttRetain)});
 });
 
-function mqttPublish(device, service, payload, options = {retain: (config.mqttRetain)}) {
-    topic = config.name + "/status/" + device.deviceId + service;
-    mqtt.publish(topic, payload, options);
-}
-mqtt.on('message', (topic, payload) => {
-    payload = payload.toString();
-    log.debug('mqtt <', topic, payload);
-
-    if (payload.indexOf('{') !== -1) {
-        try {
-            payload = JSON.parse(payload);
-            payload = payload["val"];
-        } catch (err) {
-            log.error(err.toString());
-        }
-    } else if (payload === 'false') {
-        payload = false;
-    } else if (payload === 'true') {
-        payload = true;
-    } else if (!isNaN(payload)) {
-        payload = parseFloat(payload);
-    }
-    const [, method, id, datapoint] = topic.split('/');
-
-    log.debug("mqtt < ", method, id, datapoint);
-
-    switch (method) {
-        case 'set':
-            if (datapoint == "poweron") {
-                if (client.devices.has(id)) {
-                    const device = client.devices.get(id);
-
-                    device.setPowerState(payload);
-                }
-            }
-            break;
-
-        default:
-            log.error('unknown method', method);
-    }
-});
-
-
 const client = new Hs100Api.Client({logLevel: config.verbosity, logger: log});
 
 client.on('device-new', (device) => {
     log.info('hs100 device-new', device.model, device.host, device.deviceId, device.name);
-    mqttPublish(device, "/online", "true");
+    mqtt.publish(config.name + "/status/" + device.deviceId + "/online", true);
+    mqtt.subscribe(config.name + "/set/" + device.deviceId + "/poweron", (topic, payload, packet) => {
+        device.setPowerState(payload);
+    });
 
     device.startPolling(config.pollingInterval);
 
     device.on('power-on', () => { 
         log.debug('hs100 power-on callback', device.name);
-        mqttPublish(device, "/poweron", true);
+        mqtt.publish(config.name + "/status/" + device.deviceId + "/poweron", true);
     });
     device.on('power-off', () => { 
         log.debug('hs100 power-off callback', device.name);
-        mqttPublish(device, "/poweron", false);
+        mqtt.publish(config.name + "/status/" + device.deviceId + "/poweron", false);
     });
     device.on('power-update', (powerOn) => { 
         log.debug('hs100 power-update callback', device.name, powerOn);
-        mqttPublish(device, "/poweron", powerOn);
+        mqtt.publish(config.name + "/status/" + device.deviceId + "/poweron", powerOn);
     });
 
     device.on('emeter-realtime-update', (consumption) => { 
         log.debug('hs100 emeter-realtime-update callback', device.name, String(consumption.power) );
 
-        mqttPublish(device, "/consumption/current", consumption.current);
-        mqttPublish(device, "/consumption/voltage", consumption.voltage);
-        mqttPublish(device, "/consumption/power",   consumption.power);
-        mqttPublish(device, "/consumption/total",   consumption.total);
+        mqtt.publishMulti(config.name + "/status/" + device.deviceId + "/consumption", consumption);
     });
 });
 client.on('device-online', (device) => { 
     log.debug('hs100 device-online callback', device.name);
-    mqttPublish(device, "/online", "true");
+    mqtt.publish(config.name + "/status/" + device.deviceId + "/online", true);
 });
 client.on('device-offline', (device) => { 
     log.warn('hs100 device-offline callback', device.name);
-    mqttPublish(device, "/online", "false");
+    mqtt.publish(config.name + "/status/" + device.deviceId + "/online", false);
 });
 
 log.info('Starting Device Discovery');
 client.startDiscovery({
-    devices: devices,
-    discoveryInterval: config.pollingInterval
+    devices: devices
 });
