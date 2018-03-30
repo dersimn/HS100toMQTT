@@ -12,7 +12,7 @@
   "author": "Simon Christmann <simon@christmann.email>",
   "license": "ISC",
   "dependencies": {
-    "mqtt": "^2.17.0",
+    "mqtt-smarthome-connect": "0.0.2",
     "tplink-smarthome-api": "^0.22.0",
     "yalm": "^4.1.0",
     "yargs": "^11.0.0"

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const Mqtt = require('mqtt');
+const MqttSmarthome = require("mqtt-smarthome-connect");
 const Hs100Api = require('tplink-smarthome-api');
 const log = require('yalm');
 //const log = {setLevel: ()=>{}, debug: console.log, info: console.log, warn: console.log, error: console.log };
@@ -44,13 +44,15 @@ if (config.deviceTable) {
 }
 
 log.info('mqtt trying to connect', config.mqttUrl);
-var mqttConnected = false;
-const mqtt = Mqtt.connect(config.mqttUrl, {
+const mqtt = new MqttSmarthome(config.mqttUrl, {
+    logger: log,
     clientId: config.name + '_' + Math.random().toString(16).substr(2, 8),
     will: {topic: config.name + '/connected', payload: '0', retain: (config.mqttRetain)},
     username: config.mqttUsername,
     password: config.mqttPassword
 });
+mqtt.connect();
+
 mqtt.on('connect', () => {
     mqttConnected = true;
 
