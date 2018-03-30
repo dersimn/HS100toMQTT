@@ -14,7 +14,7 @@ const config = require('yargs')
     .describe('mqtt-url', 'mqtt broker url. See https://github.com/mqttjs/MQTT.js#connect-using-a-url')
     .describe('mqtt-username', 'mqtt broker username')
     .describe('mqtt-password', 'mqtt broker password')
-    .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages')
+    .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages').boolean('mqtt-retain')
     .describe('polling-interval', 'polling interval (in ms) to search for new devices and poll already added devices for status updates')
     .describe('device-table', 'load device table from json file')
     .alias({
@@ -22,7 +22,6 @@ const config = require('yargs')
         m: 'mqtt-url',
         v: 'verbosity'
     })
-    .boolean('mqtt-retain')
     .default({
         name: 'hs100',
         'mqtt-url': 'mqtt://127.0.0.1',
