@@ -17,7 +17,7 @@ const config = require('yargs')
     .describe('mqtt-password', 'mqtt broker password')
     .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages').boolean('mqtt-retain')
     .describe('polling-interval', 'polling interval (in ms) for status updates')
-    .describe('devices', 'specify fixed device IPs instead of auto-discover').array('devices')
+    .describe('devices', 'list of device IPs as String, multiple IPs separated by space')
     .alias({
         h: 'help',
         m: 'mqtt-url',
@@ -38,8 +38,8 @@ let devices = [];
 log.setLevel(config.verbosity);
 log.info(pkg.name + ' ' + pkg.version + ' starting');
 log.debug("loaded config: ", config);
-if (config.devices instanceof Array) {
-    config.devices.forEach( (ip) => {
+if (typeof config.devices === 'string') {
+    config.devices.split(" ").forEach( (ip) => {
         devices.push({"host":ip, "port":9999});
     });
 }
