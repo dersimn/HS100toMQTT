@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "mqtt-smarthome-connect": "0.0.2",
+    "shortid": "^2.2.8",
     "tplink-smarthome-api": "^0.22.0",
     "yalm": "^4.1.0",
     "yargs": "^11.0.0"

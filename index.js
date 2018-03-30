@@ -3,6 +3,7 @@
 const MqttSmarthome = require("mqtt-smarthome-connect");
 const Hs100Api = require('tplink-smarthome-api');
 const log = require('yalm');
+const shortid = require('shortid');
 //const log = {setLevel: ()=>{}, debug: console.log, info: console.log, warn: console.log, error: console.log };
 
 const pkg = require('./package.json');
@@ -46,7 +47,7 @@ if (config.deviceTable) {
 log.info('mqtt trying to connect', config.mqttUrl);
 const mqtt = new MqttSmarthome(config.mqttUrl, {
     logger: log,
-    clientId: config.name + '_' + Math.random().toString(16).substr(2, 8),
+    clientId: config.name + '_' + + shortid.generate(),
     will: {topic: config.name + '/connected', payload: '0', retain: (config.mqttRetain)},
     username: config.mqttUsername,
     password: config.mqttPassword
@@ -54,52 +55,13 @@ const mqtt = new MqttSmarthome(config.mqttUrl, {
 mqtt.connect();
 
 mqtt.on('connect', () => {
-    mqttConnected = true;
-
     log.info('mqtt connected', config.mqttUrl);
     mqtt.publish(config.name + '/connected', '1', {retain: (config.mqttRetain)});
-
-    log.info('mqtt subscribe', config.name + '/set/#');
-    mqtt.subscribe(config.name + '/set/#');
-});
-mqtt.on('close', () => {
-    if (mqttConnected) {
-        mqttConnected = false;
-        log.error('mqtt closed ' + config.mqttUrl);
-    }
-});
-mqtt.on('error', err => {
-    log.error('mqtt', err);
-});
-mqtt.on('close', () => {
-    log.warn('mqtt close');
-});
-mqtt.on('offline', () => {
-    log.warn('mqtt offline');
-});
-mqtt.on('reconnect', () => {
-    log.info('mqtt reconnect');
 });
 
 function mqttPublish(device, service, payload, options = {retain: (config.mqttRetain)}) {
-    if (typeof payload === 'object') {
-        payload = JSON.stringify(payload);
-    } else if (payload != null) {
-        payload = String(payload);
-    } else {
-        log.error("mqtt publish, payload given: NULL");
-        return;
-    }
-
     topic = config.name + "/status/" + device.deviceId + service;
-
-    mqtt.publish(topic, payload, options, err => {
-        if (err) {
-            log.error('mqtt publish', err);
-        } else {
-            log.debug('mqtt >', topic, payload);
-        }
-    });
+    mqtt.publish(topic, payload, options);
 }
 mqtt.on('message', (topic, payload) => {
     payload = payload.toString();
