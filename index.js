@@ -50,7 +50,10 @@ const mqtt = new MqttSmarthome(config.mqttUrl, {
     clientId: config.name + '_' + + shortid.generate(),
     will: {topic: config.name + '/connected', payload: '0', retain: (config.mqttRetain)},
     username: config.mqttUsername,
-    password: config.mqttPassword
+    password: config.mqttPassword,
+    globalOptions: {
+        retain: (config.mqttRetain)
+    }
 });
 mqtt.connect();
 
@@ -85,7 +88,6 @@ client.on('device-new', (device) => {
 
     device.on('emeter-realtime-update', (consumption) => { 
         log.debug('hs100 emeter-realtime-update callback', device.name, String(consumption.power) );
-
         mqtt.publishMulti(config.name + "/status/" + device.deviceId + "/consumption", consumption);
     });
 });
