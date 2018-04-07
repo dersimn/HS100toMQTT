@@ -57,7 +57,7 @@ const client = new Hs100Api.Client({logLevel: config.verbosity, logger: log});
 
 client.on('device-new', (device) => {
     log.info('hs100 device-new', device.model, device.host, device.deviceId, device.name);
-    mqtt.publish(config.name + "/status/" + device.deviceId + "/online", true);
+    mqtt.publish(config.name + "/maintenance/" + device.deviceId + "/online", true);
     mqtt.subscribe(config.name + "/set/" + device.deviceId + "/poweron", (topic, payload, packet) => {
         device.setPowerState(payload);
     });
@@ -84,11 +84,11 @@ client.on('device-new', (device) => {
 });
 client.on('device-online', (device) => { 
     log.debug('hs100 device-online callback', device.name);
-    mqtt.publish(config.name + "/status/" + device.deviceId + "/online", true);
+    mqtt.publish(config.name + "/maintenance/" + device.deviceId + "/online", true);
 });
 client.on('device-offline', (device) => { 
     log.warn('hs100 device-offline callback', device.name);
-    mqtt.publish(config.name + "/status/" + device.deviceId + "/online", false);
+    mqtt.publish(config.name + "/maintenance/" + device.deviceId + "/online", false);
 });
 
 log.info('Starting Device Discovery');
