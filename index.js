@@ -13,8 +13,6 @@ const config = require('yargs')
     .describe('verbosity', 'possible values: "error", "warn", "info", "debug"')
     .describe('name', 'instance name. used as mqtt client id and as prefix for connected topic')
     .describe('mqtt-url', 'mqtt broker url. See https://github.com/mqttjs/MQTT.js#connect-using-a-url')
-    .describe('mqtt-username', 'mqtt broker username')
-    .describe('mqtt-password', 'mqtt broker password')
     .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages').boolean('mqtt-retain')
     .describe('polling-interval', 'polling interval (in ms) for status updates')
     .describe('devices', 'list of device IPs as String, multiple IPs separated by space')
@@ -49,8 +47,6 @@ const mqtt = new MqttSmarthome(config.mqttUrl, {
     logger: log,
     clientId: config.name + '_' + + shortid.generate(),
     will: {topic: config.name + '/connected', payload: '0', retain: (config.mqttRetain)},
-    username: config.mqttUsername,
-    password: config.mqttPassword,
     globalOptions: {
         retain: (config.mqttRetain)
     }
