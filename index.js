@@ -13,7 +13,6 @@ const config = require('yargs')
     .describe('verbosity', 'possible values: "error", "warn", "info", "debug"')
     .describe('name', 'instance name. used as mqtt client id and as prefix for connected topic')
     .describe('mqtt-url', 'mqtt broker url. See https://github.com/mqttjs/MQTT.js#connect-using-a-url')
-    .describe('mqtt-retain', 'allow/disallow retain flag for mqtt messages').boolean('mqtt-retain')
     .describe('polling-interval', 'polling interval (in ms) for status updates')
     .describe('devices', 'list of device IPs as String, multiple IPs separated by space')
     .alias({
@@ -24,7 +23,6 @@ const config = require('yargs')
     .default({
         name: 'hs100',
         'mqtt-url': 'mqtt://127.0.0.1',
-        'mqtt-retain': true,
         'polling-interval': 3000
     })
     .version()
@@ -46,16 +44,13 @@ log.info('mqtt trying to connect', config.mqttUrl);
 const mqtt = new MqttSmarthome(config.mqttUrl, {
     logger: log,
     clientId: config.name + '_' + + shortid.generate(),
-    will: {topic: config.name + '/connected', payload: '0', retain: (config.mqttRetain)},
-    globalOptions: {
-        retain: (config.mqttRetain)
-    }
+    will: {topic: config.name + '/connected', payload: '0', retain: true}
 });
 mqtt.connect();
 
 mqtt.on('connect', () => {
     log.info('mqtt connected', config.mqttUrl);
-    mqtt.publish(config.name + '/connected', '1', {retain: (config.mqttRetain)});
+    mqtt.publish(config.name + '/connected', '1', {retain: true});
 });
 
 const client = new Hs100Api.Client({logLevel: config.verbosity, logger: log});
