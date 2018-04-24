@@ -72,7 +72,7 @@ client.on('device-new', (device) => {
         if (typeof message === 'boolean') {
             device.setPowerState(message);
         }
-        deviceTimer[device.deviceId].reset().exec();
+        deviceTimer[device.deviceId].exec();
     });
 
     deviceTimer[device.deviceId] = new Timer(() => {
@@ -86,7 +86,7 @@ client.on('device-new', (device) => {
             
             mqtt.publish(config.name + "/status/" + device.deviceId, message);
         });
-    }, config.pollingInterval);
+    }).start(config.pollingInterval);
 });
 client.on('device-online', (device) => { 
     log.debug('hs100 device-online callback', device.name);
