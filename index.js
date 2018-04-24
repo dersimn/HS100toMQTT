@@ -4,6 +4,7 @@ const MqttSmarthome = require("mqtt-smarthome-connect");
 const Hs100Api = require('tplink-smarthome-api');
 const log = require('yalm');
 const shortid = require('shortid');
+const Timer = require('yetanothertimerlibrary');
 //const log = {setLevel: ()=>{}, debug: console.log, info: console.log, warn: console.log, error: console.log };
 
 const pkg = require('./package.json');
@@ -29,7 +30,7 @@ const config = require('yargs')
     .help('help')
     .argv;
 
-let devices = [];
+const devices = [];
 
 log.setLevel(config.verbosity);
 log.info(pkg.name + ' ' + pkg.version + ' starting');
@@ -39,6 +40,8 @@ if (typeof config.devices === 'string') {
         devices.push({"host":ip, "port":9999});
     });
 }
+
+const deviceTimer = {}; 
 
 log.info('mqtt trying to connect', config.mqttUrl);
 const mqtt = new MqttSmarthome(config.mqttUrl, {
@@ -58,29 +61,32 @@ const client = new Hs100Api.Client({logLevel: config.verbosity, logger: log});
 client.on('device-new', (device) => {
     log.info('hs100 device-new', device.model, device.host, device.deviceId, device.name);
     mqtt.publish(config.name + "/maintenance/" + device.deviceId + "/online", true);
-    mqtt.subscribe(config.name + "/set/" + device.deviceId + "/poweron", (topic, payload, packet) => {
-        device.setPowerState(payload);
+    mqtt.subscribe(config.name + "/set/" + device.deviceId, (topic, message, packet) => {
+        if (typeof message === 'object') {
+            if ('val' in message) {
+                if (typeof message.val === 'boolean') {
+                    device.setPowerState(message.val);
+                }
+            }
+        }
+        if (typeof message === 'boolean') {
+            device.setPowerState(message);
+        }
+        deviceTimer[device.deviceId].reset().exec();
     });
 
-    device.startPolling(config.pollingInterval);
-
-    device.on('power-on', () => { 
-        log.debug('hs100 power-on callback', device.name);
-        mqtt.publish(config.name + "/status/" + device.deviceId + "/poweron", true);
-    });
-    device.on('power-off', () => { 
-        log.debug('hs100 power-off callback', device.name);
-        mqtt.publish(config.name + "/status/" + device.deviceId + "/poweron", false);
-    });
-    device.on('power-update', (powerOn) => { 
-        log.debug('hs100 power-update callback', device.name, powerOn);
-        mqtt.publish(config.name + "/status/" + device.deviceId + "/poweron", powerOn);
-    });
-
-    device.on('emeter-realtime-update', (consumption) => { 
-        log.debug('hs100 emeter-realtime-update callback', device.name, String(consumption.power) );
-        mqtt.publishMulti(config.name + "/status/" + device.deviceId + "/consumption", consumption);
-    });
+    deviceTimer[device.deviceId] = new Timer(() => {
+        device.getInfo().then(info => {
+            let message = {};
+            message.val = info.sysInfo.relay_state === 1;
+            message.power = info.emeter.realtime.power;
+            message.voltage = info.emeter.realtime.voltage;
+            message.current = info.emeter.realtime.current;
+            message.energy = info.emeter.realtime.energy;
+            
+            mqtt.publish(config.name + "/status/" + device.deviceId, message);
+        });
+    }, config.pollingInterval);
 });
 client.on('device-online', (device) => { 
     log.debug('hs100 device-online callback', device.name);
