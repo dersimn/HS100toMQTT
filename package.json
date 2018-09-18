@@ -13,11 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "mqtt-smarthome-connect": "latest",
-    "shortid": "^2.2.8",
-    "tplink-smarthome-api": "^0.22.0",
+    "shortid": "^2.2.13",
+    "tplink-smarthome-api": "^0.23.0",
     "yalm": "^4.1.0",
     "yargs": "^11.1.0",
-    "yetanothertimerlibrary": "^2.0.0"
+    "yetanothertimerlibrary": "^2.1.0"
   },
   "devDependencies": {},
   "repository": {
