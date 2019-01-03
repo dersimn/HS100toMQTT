@@ -47,13 +47,13 @@ log.info('mqtt trying to connect', config.mqttUrl);
 const mqtt = new MqttSmarthome(config.mqttUrl, {
     logger: log,
     clientId: config.name + '_' + + shortid.generate(),
-    will: {topic: config.name + '/connected', payload: '0', retain: true}
+    will: {topic: config.name + '/maintenance/_bridge/online', payload: 'false', retain: true}
 });
 mqtt.connect();
 
 mqtt.on('connect', () => {
     log.info('mqtt connected', config.mqttUrl);
-    mqtt.publish(config.name + '/connected', '1', {retain: true});
+    mqtt.publish(config.name + '/maintenance/_bridge/online', true, {retain: true});
 });
 
 const client = new Hs100Api.Client({logLevel: config.verbosity, logger: log});
