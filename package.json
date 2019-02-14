@@ -14,7 +14,7 @@
   "dependencies": {
     "mqtt-smarthome-connect": "latest",
     "shortid": "^2.2.14",
-    "tplink-smarthome-api": "^1.0.0",
+    "tplink-smarthome-api": "^1.2.0",
     "yalm": "^4.1.0",
     "yargs": "^11.1.0",
     "yetanothertimerlibrary": "^3.1.1"
