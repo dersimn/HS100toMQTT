@@ -17,7 +17,7 @@
     "tplink-smarthome-api": "^1.0.0",
     "yalm": "^4.1.0",
     "yargs": "^11.1.0",
-    "yetanothertimerlibrary": "^2.1.0"
+    "yetanothertimerlibrary": "^3.1.1"
   },
   "devDependencies": {},
   "repository": {

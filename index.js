@@ -4,8 +4,7 @@ const MqttSmarthome = require("mqtt-smarthome-connect");
 const Hs100Api = require('tplink-smarthome-api');
 const log = require('yalm');
 const shortid = require('shortid');
-const Timer = require('yetanothertimerlibrary');
-//const log = {setLevel: ()=>{}, debug: console.log, info: console.log, warn: console.log, error: console.log };
+const Yatl = require('yetanothertimerlibrary');
 
 const pkg = require('./package.json');
 const config = require('yargs')
@@ -75,7 +74,7 @@ client.on('device-new', (device) => {
         deviceTimer[device.deviceId].exec();
     });
 
-    deviceTimer[device.deviceId] = new Timer(() => {
+    deviceTimer[device.deviceId] = new Yatl.Timer(() => {
         device.getInfo().then(info => {
             let message = {};
             message.val = info.sysInfo.relay_state === 1;
