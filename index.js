@@ -84,16 +84,27 @@ client.on('device-new', (device) => {
             message.energy = info.emeter.realtime.energy;
             
             mqtt.publish(config.name + "/status/" + device.deviceId, message);
+        }).catch((err) => { // If time is set wrong on HS100 (e.g. because you blocked internet access for it) status updates may arrive as error
+            let message = {};
+            message.val = err.response.system.get_sysinfo.relay_state === 1;
+            message.power = err.response.emeter.get_realtime.power;
+            message.voltage = err.response.emeter.get_realtime.voltage;
+            message.current = err.response.emeter.get_realtime.current;
+            message.energy = err.response.emeter.get_realtime.energy;
+            
+            mqtt.publish(config.name + "/status/" + device.deviceId, message);
         });
     }).start(config.pollingInterval);
 });
 client.on('device-online', (device) => { 
     log.debug('hs100 device-online callback', device.name);
     mqtt.publish(config.name + "/maintenance/" + device.deviceId + "/online", true);
+    deviceTimer[device.deviceId].start(config.pollingInterval);
 });
 client.on('device-offline', (device) => { 
     log.warn('hs100 device-offline callback', device.name);
     mqtt.publish(config.name + "/maintenance/" + device.deviceId + "/online", false);
+    deviceTimer[device.deviceId].stop();
 });
 
 log.info('Starting Device Discovery');
